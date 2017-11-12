@@ -1,0 +1,19 @@
+{
+  "name": "npm-sync",
+  "version": "0.0.0",
+  "description": "cli tool to sync packages in development projects",
+  "bin": {
+    "npm-sync": "./bin/npm-sync.sh"
+  },
+  "scripts": {},
+  "repository": {
+    "type": "git",
+    "url": "git@dergoldenefoehn.de:/opt/git/npm-sync.git"
+  },
+  "keywords": [],
+  "author": "Matthias Buchholz <mb@averagejoe.de>",
+  "license": "ISC",
+  "dependencies": {
+    "nodemon": "^1.12.1"
+  }
+}
