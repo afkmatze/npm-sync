@@ -123,7 +123,7 @@ function sync_package () {
 if [[ ${OPT_WATCH} -eq 1 ]]; then
   
   printf '\x1b[35;1m[npm-sync]\x1b[0m watching \x1b[1m%s\x1b[0m...\n' "${SOURCE_PACKAGE}"  
-  "${NODEMON_BIN}" -w ./ -e .ts -e .js -e .json  --exec "${SCRIPT_FILE} ${SYNC_ARGS[@]}" 
+  "${NODEMON_BIN}" --exec "${SCRIPT_FILE} ${SYNC_ARGS[@]}" 
 
 else
   sync_package
