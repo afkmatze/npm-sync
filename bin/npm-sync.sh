@@ -20,6 +20,12 @@ if [[ ! -d "${NPM_SYNC_DIR}" ]]; then
   exit 1
 fi
 
+print_log () {
+
+  printf '\x1b[35;1m[npm-sync]\x1b[0m %s \x1b[1m%s\x1b[0m\n' ${@}
+
+}
+
 NODEMON_BIN="${NPM_SYNC_DIR}/node_modules/.bin/nodemon"
 
 OPT_WATCH=0
@@ -81,7 +87,7 @@ function untar_package () {
 
   tar xf "${tmp_target}/$(basename "${package_file}")"
 
-  rsync -avzh --delete "${tmp_target}/package/." "${target_directory}"
+  rsync -azh --delete "${tmp_target}/package/." "${target_directory}"
 
   rm -rf "${tmp_target}"
 
@@ -107,23 +113,24 @@ TARGET_PACKAGE="$(cd "${TARGET_PACKAGE}"; pwd)"
 function sync_package () {
 
   if [[ ! -d "${TARGET_PACKAGE}/node_modules" ]]; then
-    printf '\x1b[35;1m[npm-sync]\x1b[0m creating \x1b[1m%s\x1b[0m\n' "${TARGET_PACKAGE}/node_modules"
+    print_log "creating" "${TARGET_PACKAGE}/node_modules"
     mkdir "${TARGET_PACKAGE}/node_modules"
   fi
 
-  printf '\x1b[35;1m[npm-sync]\x1b[0m building package of \x1b[1m%s\x1b[0m\n' "${SOURCE_PACKAGE_NAME}"
+  print_log "building package of" "${SOURCE_PACKAGE_NAME}"
   PACKAGE_TAR="$(build_package)"
 
-  printf '\x1b[35;1m[npm-sync]\x1b[0m syncing \x1b[1m%s\x1b[0m to \x1b[1m%s\x1b[0m\n' "${SOURCE_PACKAGE}" "${TARGET_PACKAGE}"
+  print_log "syncing" "${SOURCE_PACKAGE}"
+  print_log "to" "${TARGET_PACKAGE}"
   untar_package "${PACKAGE_TAR}" "${TARGET_PACKAGE}/node_modules/${SOURCE_PACKAGE_NAME}"
 
-  printf '\x1b[35;1m[npm-sync]\x1b[0m done\n'
+  print_log "done"
 }
 
 if [[ ${OPT_WATCH} -eq 1 ]]; then
   
-  printf '\x1b[35;1m[npm-sync]\x1b[0m watching \x1b[1m%s\x1b[0m...\n' "${SOURCE_PACKAGE}"  
-  "${NODEMON_BIN}" -w ./ -e .ts -e .js -e .json  --exec "${SCRIPT_FILE} ${SYNC_ARGS[@]}" 
+  print_log "watching" "${SOURCE_PACKAGE}"  
+  "${NODEMON_BIN}" -w ./ -i node_modules  --exec "${SCRIPT_FILE} ${SYNC_ARGS[@]}" 
 
 else
   sync_package
