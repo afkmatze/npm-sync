@@ -3,7 +3,8 @@
   "version": "0.0.0",
   "description": "cli tool to sync packages in development projects",
   "bin": {
-    "npm-sync": "./bin/npm-sync.sh"
+    "npm-sync": "./bin/npm-sync.sh",
+    "npm-sync-package": "./bin/sync-package.sh"
   },
   "scripts": {},
   "repository": {
