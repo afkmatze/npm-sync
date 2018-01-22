@@ -5,7 +5,7 @@
   "main": "./src",
   "typings": "./src/index.ts",
   "bin": {
-    "npm-sync": "./bin/npm-sync.sh",
+    "npm-sync": "./release/cli.js",
     "npm-sync-package": "./bin/sync-package.sh"
   },
   "scripts": {
