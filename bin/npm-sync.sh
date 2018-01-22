@@ -20,6 +20,14 @@ if [[ ! -d "${NPM_SYNC_DIR}" ]]; then
   exit 1
 fi
 
+function resolve_arg () {
+  if [[ -d "${1}" ]]; then
+    cd "${1}"
+    pwd
+  fi
+}
+
+
 NODEMON_BIN="${NPM_SYNC_DIR}/node_modules/.bin/nodemon"
 
 OPT_WATCH=0
@@ -35,7 +43,7 @@ for arg in ${@}; do
       ;;
 
     * )
-      SYNC_ARGS=(${SYNC_ARGS[@]} "${arg}")
+      SYNC_ARGS=(${SYNC_ARGS[@]} "$(resolve_arg "${arg}")")
       ;;
 
   esac
@@ -68,10 +76,31 @@ function build_package () {
 
 }
 
+function sync_to_package () {
+
+  local name="${1}"
+  local source="${2}"
+  local targets="${@:3}"
+
+  for target in ${targets[@]}; do
+    if [[ ! -d "${target}" ]]; then
+      printf '\x1b[31mInvalid target path: %s\x1b[0m\n' "${target}"
+      exit 1
+    fi
+
+    if [[ -d "${target}/node_modules/${name}" ]]; then
+      mkdir -p "${target}/node_modules/${name}"
+    fi
+
+    printf 'Syncing "%s" to %s...\n' "${name}" "${target}/node_modules/${name}"
+    rsync -avzh --delete "${source}/." "${target}/node_modules/${name}"
+  done
+
+}
+
 function untar_package () {
 
   local package_file="${1}"
-  local target_directory="${2}"
   local tmp_target="$TMPDIR/npm-sync-$RANDOM"
 
   mkdir "${tmp_target}"
@@ -81,9 +110,12 @@ function untar_package () {
 
   tar xf "${tmp_target}/$(basename "${package_file}")"
 
-  rsync -avzh --delete "${tmp_target}/package/." "${target_directory}"
+  #rsync -avzh --delete "${tmp_target}/package/." "${target_directory}"
 
-  rm -rf "${tmp_target}"
+  # sync_to_package "${package_name}" "${tmp_target}/package" ${target_directories}
+
+  # rm -rf "${tmp_target}"
+  echo "${tmp_target}/package"
 
 }
 
@@ -104,20 +136,22 @@ SOURCE_PACKAGE_NAME="$(cd "${SOURCE_PACKAGE}"; node -p 'require("./package.json"
 
 TARGET_PACKAGE="$(cd "${TARGET_PACKAGE}"; pwd)"
 
+function create_package () {
+
+  PACKAGE_TAR="$(build_package)"
+  untar_package "${PACKAGE_TAR}"
+
+}
+
 function sync_package () {
 
-  if [[ ! -d "${TARGET_PACKAGE}/node_modules" ]]; then
-    printf '\x1b[35;1m[npm-sync]\x1b[0m creating \x1b[1m%s\x1b[0m\n' "${TARGET_PACKAGE}/node_modules"
-    mkdir "${TARGET_PACKAGE}/node_modules"
-  fi
-
   printf '\x1b[35;1m[npm-sync]\x1b[0m building package of \x1b[1m%s\x1b[0m\n' "${SOURCE_PACKAGE_NAME}"
-  PACKAGE_TAR="$(build_package)"
+  PACKAGE_DIR="$(create_package)"
 
-  printf '\x1b[35;1m[npm-sync]\x1b[0m syncing \x1b[1m%s\x1b[0m to \x1b[1m%s\x1b[0m\n' "${SOURCE_PACKAGE}" "${TARGET_PACKAGE}"
-  untar_package "${PACKAGE_TAR}" "${TARGET_PACKAGE}/node_modules/${SOURCE_PACKAGE_NAME}"
+  sync_to_package "${SOURCE_PACKAGE_NAME}" "${PACKAGE_DIR}" ${SYNC_ARGS[@]}
 
   printf '\x1b[35;1m[npm-sync]\x1b[0m done\n'
+
 }
 
 if [[ ${OPT_WATCH} -eq 1 ]]; then
