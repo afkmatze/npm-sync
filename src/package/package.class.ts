@@ -57,7 +57,7 @@ export class NpmPackage {
 
   readonly modulePackages=this.readPackageModules().shareReplay()
 
-  readonly dependencyPackages:Observable<NpmPackage>=this.dependencies.concatMap ( dependency => {
+  readonly dependencyPackages=this.dependencies.concatMap ( dependency => {
     return this.resolvePackageModule(dependency.name)
   } )
 
@@ -157,9 +157,13 @@ export class NpmPackage {
   protected resolvePackageModule ( packageName:string ):Observable<NpmPackage> {
 
     const itemPath = path.join(this.source,'node_modules',packageName)
-    return this.assertPackagePath(itemPath).filter ( res => res === true ).map(p => new NpmPackage(itemPath))
+    return this.assertPackagePath(itemPath).filter ( res => res === true ).map(p => this.createPackage(itemPath))
 
 
+  }
+
+  protected createPackage ( source:string ):NpmPackage {
+    return new NpmPackage(source)
   }
 
 

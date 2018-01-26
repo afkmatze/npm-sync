@@ -14,6 +14,9 @@ import * as fsUtils from '../../utils/fs'
 import { untar } from '../../utils/tar'
 import * as rsync from 'rsync'
 
+import { log, debug } from '../../log/log'
+import { syncToPackage, packPackage } from '../actions/sync'
+
 
 export class LocalNpmPackage extends NpmPackage implements IPackageInfo {
 
@@ -37,7 +40,9 @@ export class LocalNpmPackage extends NpmPackage implements IPackageInfo {
   readonly devDependencies:any
   
   readonly peerDependencies:any
-  
+
+  readonly dependencyPackages:Observable<LocalNpmPackage>
+
 
   protected readPackageInfo ():IPackageInfo {
     return require(path.join(this.source,'package.json'))
@@ -55,18 +60,19 @@ export class LocalNpmPackage extends NpmPackage implements IPackageInfo {
 
   deleteTmp (tmpDirectory:string) {
     const tmp = tmpDirectory.replace(/package$/,'')
-    console.log('REMOVE %s', tmp)
     return fsUtils.rm(tmp,'-rf')
   }
 
-  syncToPackage ( tmpDirectory:string, targetPath:string|NpmPackage ) {
+  syncToPackage ( tmpDirectory:string, targetPath:string|NpmPackage, sourcePackageName:string=this.name ) {
 
     if ( targetPath instanceof NpmPackage ) {
-      return this.syncToPackage(tmpDirectory,targetPath.source)
+      return this.syncToPackage(tmpDirectory,targetPath.source,sourcePackageName)
     }
+      
+    const p = path.join(targetPath,'node_modules',sourcePackageName)
 
-    const p = path.join(targetPath,'node_modules',this.name)
-
+    log('installing package at "%s"', p)    
+    
     const rs = new rsync().flags('avzh').source(tmpDirectory+'/.').destination(p).delete()
 
     return new Promise((resolve,reject)=>{
@@ -81,17 +87,28 @@ export class LocalNpmPackage extends NpmPackage implements IPackageInfo {
 
   syncToPackages ( ...targetPackages:LocalNpmPackage[] ) {
 
-    return this.unpackTmp().mergeMap ( (tmpDirectory:string) => {
+    return syncToPackage ( this.source, targetPackages.map ( p => p.source ) )
 
-      return Observable.of(...targetPackages).mergeMap ( targetPackage => {
-        return this.syncToPackage(tmpDirectory,targetPackage)
-      }, 1 ).toArray().concatMap ( pckgs => {
-        return this.deleteTmp(tmpDirectory)
-      } )
+  }
 
+  syncNodeModulesToPackage ( targetPackage:LocalNpmPackage ) {
+    const sourcePackageNames = this.dependencyPackages.map ( p => p.name ).toArray()
+    const targetPackageNames = targetPackage.dependencyPackages.map ( p => p.name ).toArray()
+
+    return Observable.zip(sourcePackageNames,targetPackageNames).mergeMap ( ([sourcePackages,targetPackages]:[string[],string[]]) => {
+      return sourcePackages.filter ( sourcePackage => targetPackages.indexOf(sourcePackage) === -1 )
     } )
+    .concatMap ( missingPackageName => {
+      return syncToPackage(sourcePackage.source,targetPackage.source)
+    } )
+  }
 
+  protected resolvePackageModule ( packageName:string ):Observable<LocalNpmPackage> {
+    return super.resolvePackageModule(packageName) as Observable<LocalNpmPackage>
+  }
 
+  protected createPackage ( source:string ):LocalNpmPackage {
+    return new LocalNpmPackage(source)
   }
 
 }

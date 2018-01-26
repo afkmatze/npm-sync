@@ -7,7 +7,7 @@ import { run } from '../child_process/run'
 
 import { toString } from './toString'
 
-export function untar ( filename:string|Observable<string>, outputDirectory?:string ) 
+export function untar ( filename:string|Observable<string>, outputDirectory?:string ):Observable<string> 
 {
   if ( 'string' === typeof filename ) {
     return untar(Observable.of(filename),outputDirectory)

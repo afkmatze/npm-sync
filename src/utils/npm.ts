@@ -7,8 +7,11 @@ import 'rxjs/add/observable/concat'
 import 'rxjs/add/observable/empty'
 import 'rxjs/add/observable/throw'
 
+import * as path from 'path'
 
 import { run, RunOptions } from '../child_process/run'
+import { IPackageInfo } from '../interfaces/package-info'
+
 
 import { toString } from './toString'
 
@@ -37,6 +40,13 @@ export function npm ( options:RunOptions|string, commandName?:string, ...args:st
   })).takeUntil(cmd.close)
 }
 
+
+
 export function pack ( modulePath:string ) {
-  return npm({cwd: modulePath},'pack')
+  return npm({cwd: modulePath},'pack').map ( filename => path.resolve(modulePath,filename) )
+}
+
+
+export function readPackage ( modulePath:string ):IPackageInfo {
+  return require(path.resolve(modulePath,'package.json'))
 }
