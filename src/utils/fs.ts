@@ -1,6 +1,7 @@
 import * as path from 'path'
 import * as fs from 'fs'
 
+export { rm } from './rm'
 
 export function promiseCallback<T> (resolve:Function,reject:Function,bailValue?:T){
 
@@ -15,6 +16,35 @@ export function promiseCallback<T> (resolve:Function,reject:Function,bailValue?:
   }
 }
 
+/**
+ * create directory at filepath; 
+ * returns promise emitting boolean flag which is 
+ * true if directory was created, 
+ * false if it already existed
+ *
+ * @param      {string}  filepath  The filepath
+ * @return     {Promise<boolean>} 
+ */
+export function mkdir(filepath:string):Promise<boolean> {
+  return isDirectory(filepath,false).then ( isDir => {
+
+    if ( !isDir && filepath ) {
+      return new Promise<boolean>((resolve,reject) => {
+        fs.mkdir(filepath,(error:Error) => {
+          error ? reject(error) : resolve(true)
+        })
+      })
+    }
+
+    return Promise.resolve(false)
+  } )
+}
+
+export function mktmpdir ( prefix:string='npm-sync' ):Promise<string> {
+  return new Promise((resolve,reject)=> {
+    fs.mkdtemp(prefix,promiseCallback(resolve,reject))
+  })
+}
 
 export function readdir ( filepath:string, bail:boolean=true ):Promise<string[]> {
 

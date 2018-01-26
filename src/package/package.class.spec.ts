@@ -5,6 +5,7 @@ import * as path from 'path'
 import { NpmPackage } from './package.class'
 
 const PACKAGE_ROOT:string = path.resolve('.')
+const TARGET_PACKAGE_ROOT:string = path.join(PACKAGE_ROOT,'test-target-package')
 
 describe(`Test NpmPackage`,function(){
 
@@ -77,6 +78,27 @@ describe(`Test NpmPackage`,function(){
     })
 
   } )
+
+/*
+  describe(`unpack`, () => {
+
+    let output:string[]=[]
+    let targetPackage = new NpmPackage(TARGET_PACKAGE_ROOT)
+
+    before((done)=>{
+
+      pckg.unpackTo(pckg.pack(),targetPackage).subscribe ( out => {
+        output.push(out)
+        console.log(out)
+      }, done, done )
+
+    })    
+
+    it('output',()=>{
+      expect(output).to.be.an('array').with.length.greaterThan(0)
+    })
+
+  })*/
 
 })
 

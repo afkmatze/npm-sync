@@ -4,19 +4,32 @@ import 'rxjs/add/operator/mergeMap'
 import 'rxjs/add/operator/map'
 import 'rxjs/add/operator/mapTo'
 import 'rxjs/add/operator/concatMap'
+import 'rxjs/add/operator/take'
 import 'rxjs/add/operator/shareReplay'
 import 'rxjs/add/operator/filter'
+import 'rxjs/add/operator/switchMap'
 import 'rxjs/add/observable/fromPromise'
 import 'rxjs/add/observable/of'
+import 'rxjs/add/observable/zip'
 
 
 import * as fs from 'fs'
 import * as path from 'path'
 import * as fsUtils from '../utils/fs'
+import { run } from '../child_process/run'
+import { pack as npmPack } from '../utils/npm'
+import { untar } from '../utils/tar'
+
+
 
 
 import { IDependency } from '../interfaces/dependency'
 import { IPackageInfo } from '../interfaces/package-info'
+import { IPackageAction, IPackageActionFactory } from '../interfaces/package-action'
+
+
+import { factory as actionFactoryPack } from './actions/pack'
+import { factory as actionFactoryUnpackTo } from './actions/unpackTo'
 
 
 
@@ -29,8 +42,6 @@ export class NpmPackage {
   }
 
   readonly info:Observable<IPackageInfo>=Observable.fromPromise(this.readPackageConfig<IPackageInfo>())
-
-
 
   readonly dependencies:Observable<IDependency>=this.info.mergeMap ( info => {
     return Object.keys(info.dependencies).map ( name => {
@@ -49,6 +60,53 @@ export class NpmPackage {
   readonly dependencyPackages:Observable<NpmPackage>=this.dependencies.concatMap ( dependency => {
     return this.resolvePackageModule(dependency.name)
   } )
+
+  /**
+   * executes npm pack and returns name of tar archive created
+   *
+   * @return     {Observable<string>}  observable emitting single value of tar archive filename
+   */
+  public pack ( ):Observable<string> {
+
+    return npmPack(this.source).map ( filename => filename.slice(0,-1) )
+  }
+/*
+  public unpackTo ( archiveFilename:string ):Observable<string> 
+  public unpackTo ( archiveFilename:string, targetDirectory:string ):Observable<string> 
+  public unpackTo ( archiveFilename:Observable<string>, targetDirectory:string ):Observable<string> 
+  public unpackTo ( archiveFilename:string|Observable<string>, targetDirectory?:string ):Observable<string> 
+  {
+
+    if ( targetDirectory === undefined && 'string' === typeof archiveFilename ) {
+      return this.unpackTo ( this.pack(), archiveFilename )
+    }
+
+    if ( 'string' === typeof archiveFilename ) {
+      return this.unpackTo(Observable.of(archiveFilename),targetDirectory)
+    }
+
+    const modulenName:string = ''
+
+    return this.info.mergeMap ( info => {
+      return fsUtils.mkdir(targetDirectory).then ( () => targetDirectory )
+    } ).mergeMap ( packagePath => {
+      return archiveFilename.take(1).mergeMap((filename:string)=>{
+        return untar(filename,packagePath)
+      })
+    } )
+
+  }
+*/
+  protected createAction<R,A extends IPackageActionFactory<R>> ( actionFactory:A ) {
+
+    return this.info.map ( info => actionFactory({
+        ...info,
+        source: this.source
+      }) 
+    )
+
+  }
+
 
   readPackageConfig <T extends IPackageInfo> ():Promise<T> {
 

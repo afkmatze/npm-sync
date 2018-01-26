@@ -9,4 +9,4 @@ const argv = yargs
   .argv
 
 
-NpmSync.watchAndSync(process.cwd(),argv._.map(p => path.resolve(p)))
+NpmSync.syncPackage(process.cwd(),argv._.map(p => path.resolve(p)))
