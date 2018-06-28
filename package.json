@@ -2,19 +2,22 @@
   "name": "npm-sync",
   "version": "0.0.0",
   "description": "cli tool to sync packages in development projects",
-  "main": "./src",
-  "typings": "./src/index.ts",
+  "main": "./src/module",
+  "typings": "./src/module.ts",
   "bin": {
-    "npm-sync": "./bin/npm-sync.sh",
+    "npm-sync": "./release/cli.js",
     "npm-sync-package": "./bin/sync-package.sh"
   },
   "scripts": {
     "test": "ts-mocha ./src/**/*.spec.ts",
     "test:watch": "./scripts/watch.sh test",
+    "build:watch": "./scripts/watch.sh build",
     "lint": "tslint ./src/**/*.ts ./test/**/*.ts",
     "clean:release": "rm -rf ./release",
     "mv:build:release": "mv ./build ./release",
+    "prebuild": "npm run clean:release",
     "build": "npm run build:ts",
+    "postbuild": "chmod +x ./release/cli.js",
     "build:release": "NODE_ENV=production ./scripts/run_all.sh build:ts clean:release mv:build:release",
     "build:release:watch": "./scripts/watch.sh build:release",
     "build:ts": "tsc -p tsconfig.release.json"

@@ -13,7 +13,9 @@ export interface RunOptions extends SpawnOptions {
 
 export function run ( command:string, args:string[]=[], spawnOptions?:RunOptions ) {
 
-  console.log('\x1b[2m[run]\t\x1b[0;1;35m%s\x1b[0;35m %s\x1b[0m\n',command, args.join(' '), spawnOptions)
+  if ( process.env.NODE_ENV === 'debug' ) {
+    console.log('\x1b[2m[run]\t\x1b[0;1;35m%s\x1b[0;35m %s\x1b[0m',command, args.join(' '), spawnOptions||'')
+  }
 
   const cp = spawn(command,args,spawnOptions)
 

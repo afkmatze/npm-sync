@@ -2,7 +2,13 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 const app_class_1 = require("./app.class");
 const nodemon_1 = require("./watch/nodemon");
-const install_1 = require("./package/install");
-const build_1 = require("./package/build");
-exports.NpmSync = new app_class_1.NPMSyncApp(new nodemon_1.NodemonWatchProvider(), { buildPackage: build_1.buildPackage }, { installPackage: install_1.syncPackage });
+const buildPackage_1 = require("./buildPackage");
+const syncPackage_1 = require("./syncPackage");
+const fsUtils = require("./utils/fs");
+exports.fsUtils = fsUtils;
+var buildPackage_2 = require("./buildPackage");
+exports.buildPackage = buildPackage_2.buildPackage;
+var syncPackage_2 = require("./syncPackage");
+exports.syncPackage = syncPackage_2.syncPackage;
+exports.NpmSync = new app_class_1.NPMSyncApp(new nodemon_1.NodemonWatchProvider(), { buildPackage: buildPackage_1.buildPackage }, { installPackage: syncPackage_1.syncPackage });
 exports.default = exports.NpmSync;

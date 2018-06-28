@@ -99,7 +99,7 @@ export class LocalNpmPackage extends NpmPackage implements IPackageInfo {
       return sourcePackages.filter ( sourcePackage => targetPackages.indexOf(sourcePackage) === -1 )
     } )
     .concatMap ( missingPackageName => {
-      return syncToPackage(sourcePackage.source,targetPackage.source)
+      return syncToPackage(path.join(this.source,'node_modules',missingPackageName),path.join(targetPackage.source,'node_modules',missingPackageName))
     } )
   }
 

@@ -43,7 +43,7 @@ export function npm ( options:RunOptions|string, commandName?:string, ...args:st
 
 
 export function pack ( modulePath:string ) {
-  return npm({cwd: modulePath},'pack').map ( filename => path.resolve(modulePath,filename) )
+  return npm({cwd: modulePath},'pack').map ( filename => path.resolve(modulePath,filename.slice(0,-1)) )
 }
 
 

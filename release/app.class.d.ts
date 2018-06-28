@@ -12,5 +12,6 @@ export declare class NPMSyncApp {
     private packageBuilder;
     private packageInstaller;
     constructor(watchProvider: IWatchProvier, packageBuilder: IPackageBuilder, packageInstaller: IPackageInstaller);
+    syncPackage(filepath: string, targetPackageDirs: string[]): void;
     watchAndSync(filepath: string, targetPackages: string[]): Observable<string>;
 }

@@ -11,6 +11,13 @@ import { run, RunOptions } from '../child_process/run'
 
 import { toString } from './toString'
 
+/**
+ * sync source to destination; emits rsync verbose output
+ *
+ * @param      {string}  source       The source path
+ * @param      {string}  destination  The destination path
+ * @return     {Observable<string>}  stdout data by rsync with verbose option
+ */
 export function rsync ( source:string, destination:string ):Observable<string>
 {
   
@@ -20,7 +27,7 @@ export function rsync ( source:string, destination:string ):Observable<string>
 
   return Observable.concat(stdout,stderr.mergeMap(errors=>{
     if ( errors.length ) {
-      return Observable.throw(new Error(`Failed to run "npm ${args.join(' ')}". ${errors.join('\n---\n')}`))
+      return Observable.throw(new Error(`Failed to sync "${source}" to "${destination}". ${errors.join('\n---\n')}`))
     }
     return Observable.empty()
   })).takeUntil(cmd.close)
