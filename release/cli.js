@@ -11,6 +11,7 @@ const fs_1 = require("./utils/fs");
 const path = require("path");
 const syncPackage_1 = require("./syncPackage");
 const buildPackage_1 = require("./buildPackage");
+const log_1 = require("./log/log");
 const argv = yargs
     .usage(`$0 ...targets`)
     .demand(1)
@@ -19,7 +20,7 @@ const argv = yargs
 const destinationPackages = argv._.map(p => path.resolve(p));
 const sourcePackage = process.cwd();
 buildPackage_1.buildPackage(sourcePackage).then(tmpPackagePath => {
-    console.log('syncing %s to ', tmpPackagePath, destinationPackages);
+    log_1.debug('syncing %s to ', tmpPackagePath, destinationPackages);
     return Observable_1.Observable.of(...destinationPackages).mergeMap(destinationPackage => {
         return syncPackage_1.syncPackage(tmpPackagePath, destinationPackage);
     })

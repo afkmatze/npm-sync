@@ -1,5 +1,6 @@
+import { wrap } from './color'
 
-const PREFIX = '\x1b[35m[npm-sync]\x1b[0m\t'
+const PREFIX = wrap('[npm-sync]',[35,1])
 
 export function log ( format:string|any, ...args:any[] ) {
 
@@ -7,7 +8,7 @@ export function log ( format:string|any, ...args:any[] ) {
     return log ( '', format, ...args )
   }
 
-  console.log(PREFIX + format, ...args)
+  console.log(PREFIX + ' ' + format, ...args)
 
 }
 

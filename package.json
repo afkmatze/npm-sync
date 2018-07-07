@@ -9,6 +9,8 @@
     "npm-sync-package": "./bin/sync-package.sh"
   },
   "scripts": {
+    "test:diff": "ts-mocha ./src/merge/*.spec.ts",
+    "test:diff:watch": "./scripts/watch.sh test:diff",
     "test": "ts-mocha ./src/**/*.spec.ts",
     "test:watch": "./scripts/watch.sh test",
     "build:watch": "./scripts/watch.sh build",

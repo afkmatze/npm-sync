@@ -12,6 +12,7 @@ import { rm } from './utils/fs'
 import * as path from 'path'
 import { syncPackage } from './syncPackage'
 import { buildPackage } from './buildPackage'
+import { log, debug } from './log/log'
 
 
 const argv = yargs
@@ -25,7 +26,8 @@ const destinationPackages = argv._.map(p => path.resolve(p))
 const sourcePackage = process.cwd()
 
 buildPackage(sourcePackage).then ( tmpPackagePath => {
-  console.log('syncing %s to ', tmpPackagePath, destinationPackages)
+  
+  debug('syncing %s to ', tmpPackagePath, destinationPackages)
 
   return Observable.of(...destinationPackages).mergeMap ( destinationPackage => {
     return syncPackage ( tmpPackagePath, destinationPackage )
