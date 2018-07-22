@@ -32,6 +32,11 @@ OPT_WATCH=0
 
 SYNC_ARGS=()
 
+TMPDIR=$TMPDIR
+if [[ -z "${TMPDIR}" ]]; then
+  TMPDIR="${SCRIPT_PATH}/.tmp"
+fi
+
 for arg in ${@}; do
   
   case ${arg} in
@@ -80,7 +85,7 @@ function untar_package () {
   local target_directory="${2}"
   local tmp_target="$TMPDIR/npm-sync-$RANDOM"
 
-  mkdir "${tmp_target}"
+  mkdir -p "${tmp_target}"
   mv "${package_file}" "${tmp_target}"
 
   cd $tmp_target
