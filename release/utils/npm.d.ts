@@ -1,0 +1,13 @@
+import 'rxjs/add/operator/map';
+import 'rxjs/add/operator/toArray';
+import 'rxjs/add/operator/take';
+import 'rxjs/add/operator/takeUntil';
+import 'rxjs/add/observable/concat';
+import 'rxjs/add/observable/empty';
+import 'rxjs/add/observable/throw';
+import { RunOptions } from '../child_process/run';
+import { IPackageInfo } from '../interfaces/package-info';
+export declare function npm(options: string, ...args: string[]): any;
+export declare function npm(options: RunOptions, commandName: string, ...args: string[]): any;
+export declare function pack(modulePath: string): any;
+export declare function readPackage(modulePath: string): IPackageInfo;
