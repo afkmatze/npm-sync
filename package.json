@@ -1,6 +1,6 @@
 {
   "name": "npm-sync",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "description": "cli tool to sync packages in development projects",
   "main": "./src/module",
   "typings": "./src/module.ts",
