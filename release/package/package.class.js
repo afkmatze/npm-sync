@@ -92,7 +92,7 @@ class NpmPackage {
     }
     readPackageModules() {
         const modules_path = path.join(this.source, 'node_modules');
-        return Observable_1.Observable.fromPromise(fsUtils.readdir(modules_path, false)).mergeMap(items => {
+        return Observable_1.Observable.fromPromise(fsUtils.readdir(modules_path)).mergeMap(items => {
             return Observable_1.Observable.of(...items)
                 .concatMap(item => {
                 return this.resolvePackageModule(item);

@@ -15,7 +15,7 @@ import * as path from 'path'
 export function buildPackage ( packagePath:string ) {
 
   return pack(packagePath).toPromise().then ( archiveFilepath => {
-    return mktmpdir().then ( tmpDir => path.resolve(tmpDir) )
+    return mktmpdir('npm-sync').then ( tmpDir => path.resolve(tmpDir) )
       .then ( tmpPath => [tmpPath,archiveFilepath] )
       .catch ( console.error )
   } )

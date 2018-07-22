@@ -1,51 +1,18 @@
-import * as fs from 'fs'
+import * as fs from './utils/fs'
 
-export function readFile ( filename:string ) {
-
-  return new Promise((resolve,reject)=>{
-      
-    fs.readFile(filename,'utf8',(error:Error,result:string)=>{
-      if ( error ) {
-        reject(error)
-      } else {
-        resolve(result)
-      }
-    })
-  
-  })
-}
-
-export function writeFile ( filename:string, data:string ) {
-
-  return new Promise((resolve,reject)=>{
-      
-    fs.writeFile(filename,data,'utf8',(error:Error)=>{
-      if ( error ) {
-        reject(error)
-      } else {
-        resolve(data)
-      }
-    })
-  
-  })
-
-}
 
 export function readJSON ( filename:string ) {
-  return readFile(filename).then ( JSON.parse )
+  return fs.readFile(filename, 'utf8').then ( JSON.parse )
 }
 
 export function writeJSON ( filename:string, content:any ) {
   const json = JSON.stringify(content,null,'  ')
-  return writeFile(filename,json)
+  return fs.writeFile(filename,json,'utf8')
 }
 
 export function mergeArray <T> ( left:T[], right:T[] ) {
-
   const addRight = right.filter ( r => left.indexOf(r) === -1 )
-
   return left.concat(addRight)
-
 }
 
 export function mergeValue ( left:any, right:any ) {

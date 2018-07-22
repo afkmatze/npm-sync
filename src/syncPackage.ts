@@ -9,9 +9,42 @@ import { IPackage } from './interfaces/package'
 import * as logger from './log'
 import { mergeFiles } from './merge'
 import { merge, writeJSON } from './mergeJSON'
+import * as fs from './utils/fs'
+import * as diff from 'diff'
+
 
 
 const rg_node_modules = /\/node_modules*/
+
+/*export async function mergePackageJSONs ( sourcePackagePath:string, targetPackagePath:string ) {
+  
+  const sourcePackageFile = path.join(sourcePackagePath,'package.json')
+  const targetPackageFile = path.join(targetPackagePath,'package.json')
+
+  const targetJSON = await fs.readFile(targetPackageFile,'utf8')
+  const sourceJSON = await fs.readFile(sourcePackageFile,'utf8')
+
+  const targetDiff = diff.diffLines(targetJSON,sourceJSON)
+
+  targetDiff.forEach ( tDiff => {
+    let color:number = 2
+    
+    if ( tDiff.added ) {
+      color = 32
+    } else if ( tDiff.removed ) {
+      color = 31
+    }
+
+    logger.log(`\x1b[${color}m%s\x1b[0m`, tDiff.value)
+  } )
+  
+
+  return mergeFiles(sourcePackageFile,targetPackageFile).then ( merged => {
+    return writeJSON(targetPackageFile,merged)
+  } ).then ( json => {
+    return targetPackagePath
+  } )
+}*/
 
 export function syncPackage ( sourcePath:string, targetPackagePath:string ):Observable<string> {
 
@@ -34,12 +67,5 @@ export function syncPackage ( sourcePath:string, targetPackagePath:string ):Obse
     return file
   } )
   .toArray().mapTo(targetPackagePath)
-  .mergeMap ( targetPackagePath => {
-
-    return mergeFiles(sourcePackageJSON,targetPackageJSON).then ( merged => {
-      return writeJSON(targetPackageJSON,merged)
-    } ).then ( json => targetPackagePath )
-
-  } )
 
 }

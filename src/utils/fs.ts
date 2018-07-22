@@ -1,5 +1,6 @@
 import * as path from 'path'
 import * as fs from 'fs'
+import * as util from 'util'
 
 export { rm } from './rm'
 
@@ -40,13 +41,16 @@ export function mkdir(filepath:string):Promise<boolean> {
   } )
 }
 
-export function mktmpdir ( prefix:string='npm-sync' ):Promise<string> {
-  return new Promise((resolve,reject)=> {
-    fs.mkdtemp(prefix,promiseCallback(resolve,reject))
-  })
-}
+export const mktmpdir  = util.promisify(fs.mkdtemp)
 
-export function readdir ( filepath:string, bail:boolean=true ):Promise<string[]> {
+export const readdir = util.promisify(fs.readdir)
+
+export const readFile = util.promisify(fs.readFile)
+
+export const writeFile = util.promisify(fs.writeFile)
+
+
+export function _readdir ( filepath:string, bail:boolean=true ):Promise<string[]> {
 
   return new Promise((resolve, reject)=>{
 

@@ -20,7 +20,7 @@ export function packPackage ( sourcePackagePath:string ) {
 
   log('Packing %s...', sourcePackagePath)
 
-  return Observable.fromPromise(mktmpdir()).mergeMap ( tmpDirectory => {
+  return Observable.fromPromise(mktmpdir('npm-sync')).mergeMap ( tmpDirectory => {
     tmpDirectory = path.join(process.cwd(),tmpDirectory)
     log(tmpDirectory)
     return untar(archiveSource,tmpDirectory).toArray().mapTo ( path.join(tmpDirectory,'package') )

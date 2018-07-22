@@ -1,39 +1,13 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-const fs = require("fs");
-function readFile(filename) {
-    return new Promise((resolve, reject) => {
-        fs.readFile(filename, 'utf8', (error, result) => {
-            if (error) {
-                reject(error);
-            }
-            else {
-                resolve(result);
-            }
-        });
-    });
-}
-exports.readFile = readFile;
-function writeFile(filename, data) {
-    return new Promise((resolve, reject) => {
-        fs.writeFile(filename, data, 'utf8', (error) => {
-            if (error) {
-                reject(error);
-            }
-            else {
-                resolve(data);
-            }
-        });
-    });
-}
-exports.writeFile = writeFile;
+const fs = require("./utils/fs");
 function readJSON(filename) {
-    return readFile(filename).then(JSON.parse);
+    return fs.readFile(filename, 'utf8').then(JSON.parse);
 }
 exports.readJSON = readJSON;
 function writeJSON(filename, content) {
     const json = JSON.stringify(content, null, '  ');
-    return writeFile(filename, json);
+    return fs.writeFile(filename, json, 'utf8');
 }
 exports.writeJSON = writeJSON;
 function mergeArray(left, right) {

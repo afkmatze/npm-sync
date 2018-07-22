@@ -1,6 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const fs = require("fs");
+const util = require("util");
 var rm_1 = require("./rm");
 exports.rm = rm_1.rm;
 function promiseCallback(resolve, reject, bailValue) {
@@ -36,18 +37,16 @@ function mkdir(filepath) {
     });
 }
 exports.mkdir = mkdir;
-function mktmpdir(prefix = 'npm-sync') {
-    return new Promise((resolve, reject) => {
-        fs.mkdtemp(prefix, promiseCallback(resolve, reject));
-    });
-}
-exports.mktmpdir = mktmpdir;
-function readdir(filepath, bail = true) {
+exports.mktmpdir = util.promisify(fs.mkdtemp);
+exports.readdir = util.promisify(fs.readdir);
+exports.readFile = util.promisify(fs.readFile);
+exports.writeFile = util.promisify(fs.writeFile);
+function _readdir(filepath, bail = true) {
     return new Promise((resolve, reject) => {
         fs.readdir(filepath, promiseCallback(resolve, reject, bail ? undefined : []));
     });
 }
-exports.readdir = readdir;
+exports._readdir = _readdir;
 function stats(filepath) {
     return new Promise((resolve, reject) => {
         fs.stat(filepath, promiseCallback(resolve, reject));

@@ -11,7 +11,7 @@ const log_1 = require("./log/log");
 const path = require("path");
 function buildPackage(packagePath) {
     return npm_1.pack(packagePath).toPromise().then(archiveFilepath => {
-        return fs_1.mktmpdir().then(tmpDir => path.resolve(tmpDir))
+        return fs_1.mktmpdir('npm-sync').then(tmpDir => path.resolve(tmpDir))
             .then(tmpPath => [tmpPath, archiveFilepath])
             .catch(console.error);
     })

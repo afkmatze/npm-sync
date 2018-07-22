@@ -14,7 +14,7 @@ const log_1 = require("../../log/log");
 function packPackage(sourcePackagePath) {
     const archiveSource = npm_1.pack(sourcePackagePath).map((filename) => filename.replace(/\n$/, ''));
     log_1.log('Packing %s...', sourcePackagePath);
-    return Observable_1.Observable.fromPromise(fs_1.mktmpdir()).mergeMap(tmpDirectory => {
+    return Observable_1.Observable.fromPromise(fs_1.mktmpdir('npm-sync')).mergeMap(tmpDirectory => {
         tmpDirectory = path.join(process.cwd(), tmpDirectory);
         log_1.log(tmpDirectory);
         return tar_1.untar(archiveSource, tmpDirectory).toArray().mapTo(path.join(tmpDirectory, 'package'));
