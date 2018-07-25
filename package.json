@@ -29,7 +29,7 @@
     "@types/mocha": "^2.2.41",
     "@types/node": "^8.0.9",
     "chai": "^4.0.2",
-    "mocha": "^3.4.2",
+    "mocha": "^5.2.0",
     "nodemon": "^1.11.0",
     "ts-mocha": "^1.0.3",
     "ts-node": "^3.2.0",
