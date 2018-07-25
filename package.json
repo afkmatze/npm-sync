@@ -44,6 +44,7 @@
     "nodemon": "^1.12.1",
     "rsync": "^0.6.1",
     "rxjs": "^5.5.6",
+    "teelogger": "git+ssh://git@dergoldenefoehn.de:/opt/git/teelogger.git",
     "yargs": "^10.1.1"
   },
   "repository": {

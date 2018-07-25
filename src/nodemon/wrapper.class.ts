@@ -1,3 +1,5 @@
+import { EventEmitter } from 'events'
+
 import { Observable } from 'rxjs/Observable'
 import { Observer } from 'rxjs/Observer'
 
@@ -10,46 +12,48 @@ import 'rxjs/add/observable/fromEvent'
 import * as nodemon from 'nodemon'
 
 
-export class NodemonWrapper {
+export class NodemonWrapper extends EventEmitter {
 
-  constructor ( protected options:any ) {
+  constructor ( protected nodemonInstance:any ) {
 
-    this._wrap()
+    super()
 
-    this.start = this._events.filter ( k => k[0] === 'start' ).mapTo(this)
-    this.restart = this._events.filter ( k => k[0] === 'restart' ).map ( k => k.slice(1) )
-    this.quit = this._events.filter ( k => k[0] === 'quit' ).mapTo(this)
+    this._bind()
 
   }
 
-  private _events:Observable<string[]>
-
-  public get events() {
-    return this._events
+  public on ( eventName:'start', callback:{():void} )
+  public on ( eventName:'quit', callback:{():void} )
+  public on ( eventName:'restart', callback:{(files:string[]):void} )
+  public on ( eventName:string, callback:{(...args:any[]):void} )
+  {
+    return super.on(eventName,callback)
   }
 
-  readonly start:Observable<this>
-  readonly restart:Observable<string[]>
-  readonly quit:Observable<this>
+  private _eventHandler = ( eventName:string|'start'|'restart'|'quit', files?:string[] ) => {
+    this.emit(eventName,files)
+  }
 
-  private _wrap ( ) {
+  private _bind () {
 
-    const inst:any = nodemon(this.options)
-    this._events = this._observeNodemon(inst)
+    this.nodemonInstance.on('start',this._eventHandler.bind(this,'start'))
+    this.nodemonInstance.on('quit',this._eventHandler.bind(this,'quit'))
+    this.nodemonInstance.on('restart',this._eventHandler.bind(this,'restart'))
 
   }
 
-  private _observeNodemon ( nodemonInstance:any ) {
-    return Observable.create((observer:Observer<string[]>) => {
 
-      nodemonInstance.on('start',()=>observer.next(['start']))
-      nodemonInstance.on('restart',(files:string[])=>observer.next(['restart',...files]))
-      nodemonInstance.on('quit',()=>{
-        observer.next(['quit'])
-        observer.complete()
-      })
+  public observe () {
 
-    })
+    const start = Observable.fromEvent(this,'start',()=>['start'])
+    const restart = Observable.fromEvent(this,'restart',(files:string[])=>['restart',...files])
+    const quit = Observable.fromEvent(this,'quit',()=>['quit'])
+
+    return Observable.merge(
+        start, restart
+      ).takeUntil(quit)
+
   }
+
 
 }

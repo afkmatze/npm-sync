@@ -1,36 +1,34 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+const events_1 = require("events");
 const Observable_1 = require("rxjs/Observable");
 require("rxjs/add/operator/mergeMap");
 require("rxjs/add/operator/mapTo");
 require("rxjs/add/operator/filter");
 require("rxjs/add/observable/merge");
 require("rxjs/add/observable/fromEvent");
-const nodemon = require("nodemon");
-class NodemonWrapper {
-    constructor(options) {
-        this.options = options;
-        this._wrap();
-        this.start = this._events.filter(k => k[0] === 'start').mapTo(this);
-        this.restart = this._events.filter(k => k[0] === 'restart').map(k => k.slice(1));
-        this.quit = this._events.filter(k => k[0] === 'quit').mapTo(this);
+class NodemonWrapper extends events_1.EventEmitter {
+    constructor(nodemonInstance) {
+        super();
+        this.nodemonInstance = nodemonInstance;
+        this._eventHandler = (eventName, files) => {
+            this.emit(eventName, files);
+        };
+        this._bind();
     }
-    get events() {
-        return this._events;
+    on(eventName, callback) {
+        return super.on(eventName, callback);
     }
-    _wrap() {
-        const inst = nodemon(this.options);
-        this._events = this._observeNodemon(inst);
+    _bind() {
+        this.nodemonInstance.on('start', this._eventHandler.bind(this, 'start'));
+        this.nodemonInstance.on('quit', this._eventHandler.bind(this, 'quit'));
+        this.nodemonInstance.on('restart', this._eventHandler.bind(this, 'restart'));
     }
-    _observeNodemon(nodemonInstance) {
-        return Observable_1.Observable.create((observer) => {
-            nodemonInstance.on('start', () => observer.next(['start']));
-            nodemonInstance.on('restart', (files) => observer.next(['restart', ...files]));
-            nodemonInstance.on('quit', () => {
-                observer.next(['quit']);
-                observer.complete();
-            });
-        });
+    observe() {
+        const start = Observable_1.Observable.fromEvent(this, 'start', () => ['start']);
+        const restart = Observable_1.Observable.fromEvent(this, 'restart', (files) => ['restart', ...files]);
+        const quit = Observable_1.Observable.fromEvent(this, 'quit', () => ['quit']);
+        return Observable_1.Observable.merge(start, restart).takeUntil(quit);
     }
 }
 exports.NodemonWrapper = NodemonWrapper;
