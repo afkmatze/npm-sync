@@ -1,0 +1,10 @@
+import { Observable } from 'rxjs/Observable';
+import 'rxjs/add/operator/mergeMap';
+import 'rxjs/add/operator/mapTo';
+import 'rxjs/add/operator/toArray';
+import 'rxjs/add/operator/map';
+import 'rxjs/add/operator/take';
+import 'rxjs/add/observable/fromPromise';
+export declare function assertExists(filepath: string, throwIfNot?: boolean): Promise<boolean>;
+export declare function assertPackagePath(packagePath: string, packageName: string): Promise<string>;
+export declare function syncPackage(sourcePackage: string, targetPackage: string): Observable<string>;
