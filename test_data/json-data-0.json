@@ -1,0 +1,9 @@
+{
+  "name": "Original Name",
+  "children": [
+    "foo"
+  ],
+  "deps": {
+    "foo": "foobar-dependency"
+  }
+}

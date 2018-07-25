@@ -1,0 +1,11 @@
+{
+  "name": "New Name",
+  "children": [
+    "foo",
+    "bar"
+  ],
+  "deps": {
+    "foo": "foobar-dependency",
+    "bar": "bar-dependency",
+  }
+}
